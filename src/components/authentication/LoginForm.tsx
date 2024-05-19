@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import AuthenticationService from './AuthenticationService';
 import toast from 'react-hot-toast';
+import { setCookie } from 'cookies-next';
 
 export const LoginForm = () => {
     const router = useRouter();
@@ -15,8 +16,8 @@ export const LoginForm = () => {
             const userData = await AuthenticationService.login(email, password)
             if(userData.token){
                 toast.success("Login Success!")
-                localStorage.setItem('token', userData.token)
-                localStorage.setItem('role', userData.role)
+                setCookie('token', userData.token)
+                setCookie('role', userData.role)
                 router.push("/")
             } else{
                 toast.error("Email or password is invalid!");

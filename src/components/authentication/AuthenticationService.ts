@@ -1,3 +1,5 @@
+import { deleteCookie, getCookie } from "cookies-next";
+
 class AuthenticationService {
     static BASE_URL = process.env.NEXT_PUBLIC_AUTH_API
   
@@ -109,22 +111,22 @@ class AuthenticationService {
     
   
     static logout(){
-      localStorage.removeItem('token')
-      localStorage.removeItem('role')
+      deleteCookie('token')
+      deleteCookie('role')
     }
   
     static isAuthenticated(){
-      const token = localStorage.getItem('token')
+      const token = getCookie('token');
       return !!token;
     }
   
     static isAdmin(){
-      const role = localStorage.getItem('role')
+      const role = getCookie('role')
         return role === 'ADMIN' ;
     }
     
     static isUser(){
-      const role = localStorage.getItem('role')
+      const role = getCookie('role')
         return role === 'USER' ;
     }
   
