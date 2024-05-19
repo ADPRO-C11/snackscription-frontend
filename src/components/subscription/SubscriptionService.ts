@@ -1,9 +1,9 @@
 class SubscriptionService {
-    static BASE_URL = "http://localhost:8080"
+    static BASE_URL = process.env.NEXT_PUBLIC_SUBSCRIPTION_API
     
     static async createSubscription(subscription: object){
         try{
-            const res = await fetch('http://localhost:8080/subscription/create', {
+            const res = await fetch(`${SubscriptionService.BASE_URL}/subscription/create`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ class SubscriptionService {
 
     static async getSubscription(){
         try {
-            const res = await fetch(`http://localhost:8080/subscription/list`, {
+            const res = await fetch(`${SubscriptionService.BASE_URL}/subscription/list`, {
                 cache: "no-store"
             });
             return res;
@@ -28,7 +28,7 @@ class SubscriptionService {
 
     static async getSubscriptionById(id: string){
         try{
-            const res = await fetch(`http://localhost:8080/subscription/${id}`, {
+            const res = await fetch(`${SubscriptionService.BASE_URL}/subscription/${id}`, {
                 cache: "no-store"
             });
             return res.json();
