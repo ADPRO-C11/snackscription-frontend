@@ -1,5 +1,6 @@
 "use client"
 import AuthenticationService from "@/components/authentication/AuthenticationService";
+import { getCookie, hasCookie } from "cookies-next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,7 +22,7 @@ export default function Home() {
     enabled: true
   });
 
-  if(!AuthenticationService.isAuthenticated()){
+  if(!hasCookie('token')){
     router.push('/welcome');
   }
 
@@ -32,7 +33,7 @@ export default function Home() {
   }
 
   const getUserProfile = async () => {
-    const token:string | null = localStorage.getItem('token')
+    const token = getCookie('token')
     try{
         if(token){
           const userData = await AuthenticationService.getProfile(token)
