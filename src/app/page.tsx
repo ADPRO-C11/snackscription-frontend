@@ -3,7 +3,7 @@ import AuthenticationService from "@/components/authentication/AuthenticationSer
 import { getCookie, hasCookie } from "cookies-next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function Home() {
@@ -22,9 +22,11 @@ export default function Home() {
     enabled: true
   });
 
-  if(!hasCookie('token')){
-    router.push('/welcome');
-  }
+  useEffect(() => {
+    if (!hasCookie('token')) {
+      router.push('/welcome');
+    }
+  }, [router]);
 
   const handleLogout = () => {
     AuthenticationService.logout();
