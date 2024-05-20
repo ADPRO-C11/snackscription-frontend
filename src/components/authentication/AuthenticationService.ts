@@ -1,7 +1,7 @@
 import { deleteCookie, getCookie } from "cookies-next";
 
 class AuthenticationService {
-    static BASE_URL = process.env.NEXT_PUBLIC_AUTH_API
+    static BASE_URL = '/api/auth';
   
     static async login(email: string, password: string){
       try{
