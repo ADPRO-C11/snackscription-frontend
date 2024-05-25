@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.subscription-card {
+    transform: scale(1);
+    cursor: pointer; /* Add pointer cursor to indicate clickability */
+}
+
+.subscription-card:hover {
+    transform: scale(1.03); /* 3% scale effect */
+}
+
+.subscription-card.clicked {
+    background-color: #f7e3c0;
+}
