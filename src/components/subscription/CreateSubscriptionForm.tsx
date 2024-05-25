@@ -1,12 +1,44 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import React, { use, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import SubscriptionService from './SubscriptionService';
+import { getCookie } from 'cookies-next';
+import AuthenticationService from '../authentication/AuthenticationService';
 
 export const CreateSubscriptionForm = () => {
     const router = useRouter();
 
+    useEffect(() => {
+        const getUserProfile = async () => {
+            const token = getCookie('token');
+            try {
+                if (token) {
+                    const userData = await AuthenticationService.getProfile(token);
+                    setUser(userData.user);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getUserProfile();
+    }, []);
+
+    const [user, setUser] = useState({
+        id: '',
+        name: '',
+        email: '',
+        password: '',
+        role: '',
+        accountNonExpired: true,
+        accountNonLocked: true,
+        credentialsNonExpired: true,
+        authorities: [],
+        username: '',
+        enabled: true
+    });
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    
     const [subscription, setSubscription] = useState({
         type: "", 
         shippingAddress: {
@@ -17,8 +49,9 @@ export const CreateSubscriptionForm = () => {
             province:"",
         },
         subscriptionBoxId: "123",
-        userId: "123"
+        userId: ""
     });
+
 
     const handleType = (event: any) => {
         setSubscription((prevState) => ({
@@ -36,14 +69,21 @@ export const CreateSubscriptionForm = () => {
                 [name]: value
             }
         }));
+
+        console.log(subscription);
     };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         try{
-            subscription["type"] = subscription.type.toUpperCase()
-            await SubscriptionService.createSubscription(subscription);
-            router.push("/subscription")
+            const token = getCookie('token');
+            if(token){
+                subscription["type"] = subscription.type.toUpperCase()
+                subscription["userId"] = user.id;
+                await SubscriptionService.createSubscription(subscription, token);
+                router.push("/subscription")
+            }
+            
         } catch (error) {
             console.log("Error", error);
         }
