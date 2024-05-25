@@ -48,25 +48,20 @@ export default function Home() {
   }
 
   return (
-    <main className="pt-16">
+    <main>
       {isAuthenticated ? (
         <>
           <Navbar username={user.name} />
-          <MainImage />
-          <OurPlan />
-          <AboutUs />
-          <div className="flex">
-            <div>
-              <p></p>
-            </div>
+          <div className="mt-16">
+            <MainImage />
+            <OurPlan />
+            <AboutUs />
           </div>
         </>
         
       ) : (
-        <div className="w-full h-screen flex flex-col items-center justify-center">
-          <div className="bg-white py-10 w-[300px] sm:w-[500px] rounded-3xl shadow-xl flex flex-col gap-10 items-center justify-center">
-            <p className="sm:text-3xl text-center">Loading...</p>
-          </div>
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Loading...</p>
         </div>
       )}
     </main>

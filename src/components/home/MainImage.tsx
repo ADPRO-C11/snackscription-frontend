@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export const MainImage = () => {
   return (
-    <div className="relative h-[600px] overflow-hidden ">
+    <div className="relative h-[700px] overflow-hidden ">
         <Image 
             src="/static/images/Snacks.jpg"
             alt="Image of Snacks"
