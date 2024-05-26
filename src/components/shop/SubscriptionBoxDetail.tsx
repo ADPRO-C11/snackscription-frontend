@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import SubscriptionBoxService from '../subscription-box/SubscriptionBoxService';
 import { SubscriptionBoxCard } from './SubscriptionBoxCard';
 import { SubscriptionBoxEditModal } from '../adminpage/subscriptionbox/SubscriptionBoxEditModal';
+
 interface SubscriptionBox {
   id: string;
   name: string;
