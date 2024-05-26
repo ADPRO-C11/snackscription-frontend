@@ -1,8 +1,9 @@
 'use client'
-import { ReviewAdmin } from "@/components/modules/ReviewModule/ReviewAdmin"
+
+import { ReviewAdminModule } from "@/components/review/ReviewAdminModule";
 
 const AdminPage = () => {
-    return <ReviewAdmin />
+    return <ReviewAdminModule />
 }
 
 export default AdminPage;

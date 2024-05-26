@@ -1,7 +1,15 @@
+/*
+(User) review display and submission module
+
+usage: 
+<ReviewModule subsbox={subsboxId} user={userEmail}/>
+*/
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Review } from "./interface";
 import { ReviewCard } from "./ReviewCard";
+import { ReviewCardState } from "./ReviewCardState";
 
 const ReviewForm = ({
   subsboxId,
@@ -65,6 +73,7 @@ interface ID {
 }
 
 export const ReviewModule = ({user, subsbox} : {user: string, subsbox: string}) => {
+  const [myReview, setMyReview] = useState<Review | null>(null);
   const [data, setData] = useState<Review[]>([]);
 
   useEffect(() => {
@@ -82,7 +91,10 @@ export const ReviewModule = ({user, subsbox} : {user: string, subsbox: string}) 
   return (
     <section className="bg-slate-300 flex justify-center">
       <div className="flex flex-col p-5 w-screen space-y-4 bg-white">
-        <ReviewForm subsboxId={subsbox} userId={user} />
+        {myReview ? 
+        <ReviewCardState review={myReview} />
+        :<ReviewForm subsboxId={subsbox} userId={user} />}
+        
         {data.map((review) => (
           <ReviewCard key={review.author} review={review} />
         ))}

@@ -1,13 +1,9 @@
 "use client"
 
-import { ReviewModule } from "@/components/modules/ReviewModule"
+import { ReviewModule } from "@/components/review/ReviewModule"
 
 const Review = () => {
-    const id = {
-        subsbox: "1",
-        user: "asteriskzie"
-    }
-    return <ReviewModule subsbox="1" user="asteriskzie"/>
+    return <ReviewModule subsbox="1" user="bunga"/>
 }
 
 export default Review;
