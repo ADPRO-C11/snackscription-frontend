@@ -20,7 +20,7 @@ export const Navbar = ({username}: any) => {
             <h1 className='font-bold text-xl text-white'><Link href={"/"}>Snackscription</Link></h1>
             <div className='flex justify-between items-center gap-10 ml-24'>
                 <Link href={'/'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">Home</Link>
-                <Link href={'#'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">Shop</Link>
+                <Link href={'/shop'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">Shop</Link>
                 <Link href={'/subscription'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">My Subscriptions</Link>
             </div>
             <div className='flex items-center justify-center gap-6'>
