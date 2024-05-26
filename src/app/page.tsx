@@ -1,24 +1,69 @@
-import Image from "next/image";
+"use client";
+import AuthenticationService from "@/components/authentication/AuthenticationService";
+import { Navbar } from "@/components/common/Navbar";
+import { AboutUs } from "@/components/home/AboutUs";
+import { MainImage } from "@/components/home/MainImage";
+import { OurPlan } from "@/components/home/OurPlan";
+import { getCookie, hasCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
+  const [user, setUser] = useState({
+    id: '',
+    name: '',
+    email: '',
+    password: '',
+    role: '',
+    accountNonExpired: true,
+    accountNonLocked: true,
+    credentialsNonExpired: true,
+    authorities: [],
+    username: '',
+    enabled: true
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (!hasCookie('token')) {
+      setIsAuthenticated(false);
+      router.push('/welcome');
+    } else {
+      setIsAuthenticated(true);
+      getUserProfile();
+    }
+  }, [router]);
+
+  const getUserProfile = async () => {
+    const token = getCookie('token');
+    try {
+      if (token) {
+        const userData = await AuthenticationService.getProfile(token);
+        setUser(userData.user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-32 gap-10">
-       
-        <Image 
-          src={"/static/images/Snacks.jpg"}
-          alt="Image of Snacks"
-          quality={100}
-          fill
-          sizes="100vw"
-          style={{
-            objectFit: 'cover',
-            zIndex: -1
-          }}
-        />
-        <div className="bg-white p-24 rounded-3xl shadow-xl flex flex-col gap-10">
-          <p className="text-5xl text-center">Welcome to <b>Snackscription</b>!</p>
-          <p className="text-xl text-center text-gray-500">This website is currently under development.</p>
+    <main>
+      {isAuthenticated ? (
+        <>
+          <Navbar username={user.name} />
+          <div className="mt-16">
+            <MainImage />
+            <OurPlan />
+            <AboutUs />
+          </div>
+        </>
+        
+      ) : (
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Loading...</p>
         </div>
+      )}
     </main>
   );
 }
