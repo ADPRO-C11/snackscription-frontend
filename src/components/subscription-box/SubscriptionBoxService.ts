@@ -44,36 +44,41 @@ class SubscriptionBoxService {
             throw error;
         }
     }
-
-    static async updateSubscriptionBox(subscription: object, token: string): Promise<any> {
+    static async updateSubscriptionBox(subscription: object, token: string) {
         try {
-            const res = await fetch(`${SubscriptionBoxService.BASE_URL}/subscription-box/update`, {
-                method: "PATCH",
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(subscription),
-            });
-            return res.json();
+          const res = await fetch(`${SubscriptionBoxService.BASE_URL}/subscription-box/update`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(subscription),
+          });
+          return res.json();
         } catch (error) {
-            throw error;
+          throw error;
         }
-    }
+      }
 
     static async deleteSubscriptionBox(id: string, token: string): Promise<any> {
         try {
-            const res = await fetch(`${SubscriptionBoxService.BASE_URL}/subscription-box/${id}`, {
-                method: "DELETE",
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-            });
-            return res.json();
+          const res = await fetch(`${SubscriptionBoxService.BASE_URL}/subscription-box/${id}`, {
+            method: "DELETE",
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+          });
+      
+          if (res.ok) {
+            return res.text(); // Return the plain text response
+          } else {
+            throw new Error('Failed to delete the subscription box');
+          }
         } catch (error) {
-            throw error;
+          throw error;
         }
-    }
+      }
+      
 
     static async findByPriceLessThan(price: number, token: string): Promise<any> {
         try {
@@ -148,6 +153,21 @@ class SubscriptionBoxService {
     static async getLogs(token: string): Promise<any> {
         try {
             const res = await fetch(`${SubscriptionBoxService.BASE_URL}/subscription-box/logs`, {
+                cache: "no-store",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            return res.json();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
+    static async getItems(token: string): Promise<any> {
+        try {
+            const res = await fetch(`${SubscriptionBoxService.BASE_URL}/items/list`, {
                 cache: "no-store",
                 headers: {
                     'Authorization': `Bearer ${token}`

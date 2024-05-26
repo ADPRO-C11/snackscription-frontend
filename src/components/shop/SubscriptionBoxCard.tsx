@@ -1,6 +1,6 @@
 
 import React from 'react';
-
+import { getCookie } from 'cookies-next';
 
 interface SubscriptionBoxCardProps {
   id: string;
@@ -9,9 +9,19 @@ interface SubscriptionBoxCardProps {
   price: number;
   items: { id: string; name: string; quantity: number; }[];
   description: string;
+  onDelete: (id: string) => void;
+  onUpdate: () => void;
 }
 
-export const SubscriptionBoxCard: React.FC<SubscriptionBoxCardProps> = ({ id, name, type, price, items, description }) => {
+export const SubscriptionBoxCard: React.FC<SubscriptionBoxCardProps> = ({ id, name, type, price, items, description, onDelete, onUpdate }) => {
+  const role = getCookie('role') as string;
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this subscription box?')) {
+      onDelete(id);
+    }
+  };
+
   return (
 
     <div className='border border-black p-5 rounded-xl flex flex-col gap-5 transform-container'>
@@ -28,7 +38,12 @@ export const SubscriptionBoxCard: React.FC<SubscriptionBoxCardProps> = ({ id, na
           <li key={item.id}>{item.name} (Quantity: {item.quantity})</li>
         ))}
       </ul>
-
+      {role === 'ADMIN' && (
+        <div className='flex gap-2'>
+          <button className='border border-blue-500 bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600' onClick={onUpdate}>Update</button>
+          <button className='border border-red-500 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600' onClick={handleDelete}>Delete</button>
+        </div>
+      )}
       <style jsx>{`
         .transform-container {
           transition: transform 0.3s ease;
