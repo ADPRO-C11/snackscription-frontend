@@ -1,8 +1,9 @@
+import React, { useState, useEffect } from 'react';
 import { getCookie } from 'cookies-next';
-import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SubscriptionBoxService from '../subscription-box/SubscriptionBoxService';
 import { SubscriptionBoxCard } from './SubscriptionBoxCard';
+import SubscriptionModal from './SubscriptionModal';
 
 interface SubscriptionBox {
   id: string;
@@ -24,6 +25,8 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
   const [searchedName, setSearchedName] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [price, setPrice] = useState<number>(-1);
+  const [selectedBox, setSelectedBox] = useState<SubscriptionBox | null>(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const router = useRouter();
 
   const getSubscriptionBox = async (name?: string, price?: number, filter?: string) => {
@@ -32,7 +35,7 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
       if (token) {
         let subscriptionBoxesList: SubscriptionBox[] = [];
         if (name) {
-          subscriptionBoxesList = await SubscriptionBoxService.findByName(name, token); // Correctly call findByName with name and token
+          subscriptionBoxesList = await SubscriptionBoxService.findByName(name, token);
         } else if (price !== undefined && price > -1 && filter) {
           switch (filter) {
             case 'less-than':
@@ -71,7 +74,7 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
   const handleSearch = () => {
     const name = (document.getElementById('searched_name') as HTMLInputElement).value;
     setSearchedName(name);
-    getSubscriptionBox(name, price, priceFilter); // Ensure getSubscriptionBox is called with name
+    getSubscriptionBox(name, price, priceFilter);
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +88,16 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
 
   const handleNavigation = () => {
     router.push('/shop');
+  };
+
+  const handleCardClick = (box: SubscriptionBox) => {
+    setSelectedBox(box);
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setSelectedBox(null);
   };
 
   return (
@@ -137,20 +150,28 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
       <div className='grid grid-cols-3 gap-10'>
         {subscriptionBoxes && subscriptionBoxes.length > 0 ? (
           subscriptionBoxes.map((box) => (
-            <SubscriptionBoxCard
-              key={box.id}
-              id={box.id}
-              name={box.name}
-              type={box.type}
-              price={box.price}
-              items={box.items}
-              description={box.description}
-            />
+            <div key={box.id} onClick={() => handleCardClick(box)}>
+              <SubscriptionBoxCard
+                id={box.id}
+                name={box.name}
+                type={box.type}
+                price={box.price}
+                items={box.items}
+                description={box.description}
+              />
+            </div>
           ))
         ) : (
           <p>No subscription boxes found.</p>
         )}
       </div>
+      {selectedBox && (
+        <SubscriptionModal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          subscriptionBox={selectedBox}
+        />
+      )}
     </>
   );
 };

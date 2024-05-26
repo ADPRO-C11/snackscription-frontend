@@ -85,7 +85,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ subscription, onC
         <div className="mb-4">
           <h3 className="font-semibold text-lg mb-2">Shipping Address</h3>
           {isEditing ? (
-            <div className="space-y-2">
+            <div className="flex flex-col items-center justify-center space-y-2">
               <label>Address</label>
               <input
                 type="text"
