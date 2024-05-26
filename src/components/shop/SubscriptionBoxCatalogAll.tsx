@@ -3,7 +3,7 @@ import { getCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
 import SubscriptionBoxService from '../subscription-box/SubscriptionBoxService';
 import { SubscriptionBoxCard } from './SubscriptionBoxCard';
-import { SubscriptionBoxEditModal } from '../adminpage/subscriptionbox/SubscriptionBoxEditModal';
+import SubscriptionModal from './SubscriptionModal';
 
 interface SubscriptionBox {
   id: string;
@@ -22,7 +22,6 @@ interface Item {
 
 export const SubscriptionBoxCatalogAll: React.FC = () => {
   const [subscriptionBoxes, setSubscriptionBoxes] = useState<SubscriptionBox[]>([]);
-  const [filteredBoxes, setFilteredBoxes] = useState<SubscriptionBox[]>([]);
   const [searchedName, setSearchedName] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [price, setPrice] = useState<number>(-1);
@@ -30,112 +29,68 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const router = useRouter();
 
-  const fetchSubscriptionBoxes = async () => {
-    try {
-      const token = getCookie('token');
-      if (token) {
-        const subscriptionBoxesList: SubscriptionBox[] = await SubscriptionBoxService.getSubscriptionBox(token);
-        setSubscriptionBoxes(subscriptionBoxesList);
-        setFilteredBoxes(subscriptionBoxesList); // Initialize filtered boxes with all boxes
-      }
-    } catch (error) {
-      console.log("Error", error);
-      setSubscriptionBoxes([]);
-      setFilteredBoxes([]);
-    }
-  };
-
-  const fetchSubscriptionBoxesByPrice = async (price: number, filter: string) => {
+  const getSubscriptionBox = async (name?: string, price?: number, filter?: string) => {
     try {
       const token = getCookie('token');
       if (token) {
         let subscriptionBoxesList: SubscriptionBox[] = [];
-        switch (filter) {
-          case 'less-than':
-            subscriptionBoxesList = await SubscriptionBoxService.findByPriceLessThan(price, token);
-            break;
-          case 'greater-than':
-            subscriptionBoxesList = await SubscriptionBoxService.findByPriceGreaterThan(price, token);
-            break;
-          case 'equals':
-            subscriptionBoxesList = await SubscriptionBoxService.findByPriceEquals(price, token);
-            break;
-          default:
-            break;
+        if (name) {
+          subscriptionBoxesList = await SubscriptionBoxService.findByName(name, token);
+        } else if (price !== undefined && price > -1 && filter) {
+          switch (filter) {
+            case 'less-than':
+              subscriptionBoxesList = await SubscriptionBoxService.findByPriceLessThan(price, token);
+              break;
+            case 'greater-than':
+              subscriptionBoxesList = await SubscriptionBoxService.findByPriceGreaterThan(price, token);
+              break;
+            case 'equals':
+              subscriptionBoxesList = await SubscriptionBoxService.findByPriceEquals(price, token);
+              break;
+            default:
+              break;
+          }
+        } else {
+          subscriptionBoxesList = await SubscriptionBoxService.getSubscriptionBox(token);
         }
         setSubscriptionBoxes(subscriptionBoxesList);
-        filterSubscriptionBoxes(searchedName, subscriptionBoxesList); // Apply search filter on fetched boxes
       }
     } catch (error) {
       console.log("Error", error);
       setSubscriptionBoxes([]);
-      setFilteredBoxes([]);
     }
   };
 
   useEffect(() => {
-    fetchSubscriptionBoxes();
+    getSubscriptionBox();
   }, []);
 
   useEffect(() => {
-    if (price === 0) {
-      fetchSubscriptionBoxes();
-    } else if (price > -1 && priceFilter) {
-      fetchSubscriptionBoxesByPrice(price, priceFilter);
-    } else {
-      filterSubscriptionBoxes(searchedName, subscriptionBoxes); // Apply search filter on price change
+    if (price > -1 && priceFilter) {
+      getSubscriptionBox(searchedName, price, priceFilter);
     }
-  }, [price, priceFilter]);
+  }, [price, priceFilter, searchedName]);
 
   const handleSearch = () => {
-    const name = (document.getElementById('searched_name') as HTMLInputElement).value.toLowerCase();
+    const name = (document.getElementById('searched_name') as HTMLInputElement).value;
     setSearchedName(name);
-    filterSubscriptionBoxes(name, subscriptionBoxes);
+    getSubscriptionBox(name, price, priceFilter);
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.valueAsNumber;
-    if (value === 0) {
-      fetchSubscriptionBoxes();
-      setPrice(-1); // Reset price to -1 to remove any active price filter
-    } else {
-      setPrice(value >= 0 ? value : -1);
-    }
+    setPrice(value > 0 ? value : -1);
   };
 
   const handlePriceFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const filter = event.target.value;
-    setPriceFilter(filter);
-    if (price > -1) {
-      fetchSubscriptionBoxesByPrice(price, filter);
-    }
+    setPriceFilter(event.target.value);
   };
 
   const handleNavigation = () => {
     router.push('/shop');
   };
 
-  const handleDelete = async (id: string) => {
-    const token = getCookie('token');
-    if (token) {
-      const result = await SubscriptionBoxService.deleteSubscriptionBox(id, token);
-      if (result) {
-        setSubscriptionBoxes(subscriptionBoxes.filter(box => box.id !== id));
-        setFilteredBoxes(filteredBoxes.filter(box => box.id !== id));
-      }
-    }
-  };
-
-  const handleUpdate = async (updatedBox: SubscriptionBox) => {
-    const token = getCookie('token');
-    if (token) {
-      await SubscriptionBoxService.updateSubscriptionBox(updatedBox, token);
-      setSubscriptionBoxes(subscriptionBoxes.map(box => (box.id === updatedBox.id ? updatedBox : box)));
-      setFilteredBoxes(filteredBoxes.map(box => (box.id === updatedBox.id ? updatedBox : box)));
-    }
-  };
-
-  const openEditModal = (box: SubscriptionBox) => {
+  const handleCardClick = (box: SubscriptionBox) => {
     setSelectedBox(box);
     setModalIsOpen(true);
   };
@@ -143,11 +98,6 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
   const closeModal = () => {
     setModalIsOpen(false);
     setSelectedBox(null);
-  };
-
-  const filterSubscriptionBoxes = (name: string, boxes: SubscriptionBox[]) => {
-    const filtered = boxes.filter(box => box.name.toLowerCase().includes(name));
-    setFilteredBoxes(filtered);
   };
 
   return (
@@ -198,30 +148,28 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
         </div>
       </div>
       <div className='grid grid-cols-3 gap-10'>
-        {filteredBoxes && filteredBoxes.length > 0 ? (
-          filteredBoxes.map((box) => (
-            <SubscriptionBoxCard
-              key={box.id}
-              id={box.id}
-              name={box.name}
-              type={box.type}
-              price={box.price}
-              items={box.items}
-              description={box.description}
-              onDelete={handleDelete}
-              onUpdate={() => openEditModal(box)}
-            />
+        {subscriptionBoxes && subscriptionBoxes.length > 0 ? (
+          subscriptionBoxes.map((box) => (
+            <div key={box.id} onClick={() => handleCardClick(box)}>
+              <SubscriptionBoxCard
+                id={box.id}
+                name={box.name}
+                type={box.type}
+                price={box.price}
+                items={box.items}
+                description={box.description}
+              />
+            </div>
           ))
         ) : (
           <p>No subscription boxes found.</p>
         )}
       </div>
-      {modalIsOpen && selectedBox && (
-        <SubscriptionBoxEditModal
+      {selectedBox && (
+        <SubscriptionModal
           isOpen={modalIsOpen}
-          onClose={closeModal}
+          onRequestClose={closeModal}
           subscriptionBox={selectedBox}
-          onSave={handleUpdate}
         />
       )}
     </>
