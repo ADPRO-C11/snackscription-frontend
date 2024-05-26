@@ -95,12 +95,13 @@ class AuthenticationService {
   
     static async update(userId: string, userData: object, token: string){
       try{
-        const response = await fetch(`${AuthenticationService.BASE_URL}/useradmin/delete/${userId}`, {
+        const response = await fetch(`${AuthenticationService.BASE_URL}/useradmin/update/${userId}`, {
           method: "PUT",
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
+          body: JSON.stringify(userData)
         });
         return response.json();
       } catch(err) {
