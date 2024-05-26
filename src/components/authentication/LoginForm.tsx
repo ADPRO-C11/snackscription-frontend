@@ -17,6 +17,7 @@ export const LoginForm = () => {
             if(userData.token){
                 toast.success("Login Success!")
                 setCookie('token', userData.token)
+                setCookie('role', userData.role)
                 if(userData.role === 'ADMIN'){
                     router.push("/admin")
                 }

@@ -1,7 +1,6 @@
 import { getCookie } from 'cookies-next';
 import React, { useEffect, useState } from 'react';
-
-import { useRouter }   from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import SubscriptionBoxService from '../subscription-box/SubscriptionBoxService';
 import { SubscriptionBoxNameCard } from './SubscriptionBoxNameCard';
 
@@ -24,9 +23,8 @@ interface Item {
 
 export const SubscriptionBoxCatalog: React.FC = () => {
   const [distinctNames, setDistinctNames] = useState<string[]>([]);
+  const [filteredNames, setFilteredNames] = useState<string[]>([]);
   const [searchedName, setSearchedName] = useState('');
-  const [priceFilter, setPriceFilter] = useState('');
-  const [price, setPrice] = useState<number>(-1);
   const router = useRouter();
 
   const getDistinctNames = async () => {
@@ -35,10 +33,12 @@ export const SubscriptionBoxCatalog: React.FC = () => {
       if (token) {
         const namesList = await SubscriptionBoxService.findDistinctNames(token);
         setDistinctNames(namesList);
+        setFilteredNames(namesList);
       }
     } catch (error) {
       console.log("Error", error);
       setDistinctNames([]);
+      setFilteredNames([]);
     }
   };
 
@@ -47,18 +47,12 @@ export const SubscriptionBoxCatalog: React.FC = () => {
   }, []);
 
   const handleSearch = () => {
-    const name = (document.getElementById('searched_name') as HTMLInputElement).value;
+    const name = (document.getElementById('searched_name') as HTMLInputElement).value.toLowerCase();
     setSearchedName(name);
-    getDistinctNames(); // Fetch distinct names on search
-  };
-
-  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.valueAsNumber;
-    setPrice(value > 0 ? value : -1);
-  };
-
-  const handlePriceFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setPriceFilter(event.target.value);
+    const filtered = distinctNames.filter((distinctName) => 
+      distinctName.toLowerCase().includes(name)
+    );
+    setFilteredNames(filtered);
   };
 
   const handleNavigation = () => {
@@ -89,8 +83,8 @@ export const SubscriptionBoxCatalog: React.FC = () => {
         </button>
       </div>
       <div className='grid grid-cols-3 gap-10'>
-        {distinctNames && distinctNames.length > 0 ? (
-          distinctNames.map((name, index) => (
+        {filteredNames && filteredNames.length > 0 ? (
+          filteredNames.map((name, index) => (
             <SubscriptionBoxNameCard
               key={index}
               name={name}     

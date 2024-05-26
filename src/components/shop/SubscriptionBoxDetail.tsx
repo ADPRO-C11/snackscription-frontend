@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SubscriptionBoxService from '../subscription-box/SubscriptionBoxService';
 import { SubscriptionBoxCard } from './SubscriptionBoxCard';
-
+import { SubscriptionBoxEditModal } from '../adminpage/subscriptionbox/SubscriptionBoxEditModal';
 interface SubscriptionBox {
   id: string;
   name: string;
@@ -25,6 +25,8 @@ interface SubscriptionBoxDetailProps {
 
 export default function SubscriptionBoxDetail({ name }: SubscriptionBoxDetailProps) {
   const [subscriptionBoxes, setSubscriptionBoxes] = useState<SubscriptionBox[]>([]);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [currentBox, setCurrentBox] = useState<SubscriptionBox | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -45,6 +47,29 @@ export default function SubscriptionBoxDetail({ name }: SubscriptionBoxDetailPro
 
   const handleNavigateToCatalog = () => {
     router.push('/shop/catalog');
+  };
+
+  const handleDelete = async (id: string) => {
+    const token = getCookie('token');
+    if (token) {
+      const result = await SubscriptionBoxService.deleteSubscriptionBox(id, token);
+      if (result) {
+        setSubscriptionBoxes(subscriptionBoxes.filter(box => box.id !== id));
+      }
+    }
+  };
+
+  const handleUpdate = async (updatedBox: SubscriptionBox) => {
+    const token = getCookie('token');
+    if (token) {
+      await SubscriptionBoxService.updateSubscriptionBox(updatedBox, token);
+      setSubscriptionBoxes(subscriptionBoxes.map(box => (box.id === updatedBox.id ? updatedBox : box)));
+    }
+  };
+
+  const openEditModal = (box: SubscriptionBox) => {
+    setCurrentBox(box);
+    setEditModalOpen(true);
   };
 
   if (subscriptionBoxes.length === 0) {
@@ -74,9 +99,19 @@ export default function SubscriptionBoxDetail({ name }: SubscriptionBoxDetailPro
             price={box.price}
             items={box.items}
             description={box.description}
+            onDelete={handleDelete}
+            onUpdate={() => openEditModal(box)}
           />
         ))}
       </div>
+      {isEditModalOpen && currentBox && (
+        <SubscriptionBoxEditModal
+          subscriptionBox={currentBox}
+          isOpen={isEditModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onSave={handleUpdate}
+        />
+      )}
     </div>
   );
 }
