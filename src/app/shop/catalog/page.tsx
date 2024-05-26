@@ -1,5 +1,6 @@
 'use client'
 
+import { AdminSubscriptionBoxCatalogAll } from '@/components/adminpage/subscriptionbox/CatalogueAll';
 import AuthenticationService from '@/components/authentication/AuthenticationService';
 import { Navbar } from '@/components/common/Navbar';
 import { NavbarAdmin } from '@/components/common/NavbarAdmin';
@@ -63,7 +64,11 @@ export default function Page() {
             <Navbar username={user.name} /> // Render Navbar for other roles
         )}
                 <div className='h-screen m-32'>
-                    <SubscriptionBoxCatalogAll />
+                {role === 'ADMIN' ? (
+                    <AdminSubscriptionBoxCatalogAll />
+        ) : (
+            <SubscriptionBoxCatalogAll />
+        )}
                 </div>
             </div>
         );
