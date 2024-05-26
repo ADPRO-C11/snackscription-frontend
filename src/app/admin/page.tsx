@@ -1,12 +1,19 @@
 "use client";
 import AuthenticationService from "@/components/authentication/AuthenticationService";
-import { Navbar } from "@/components/common/Navbar";
-import { AboutUs } from "@/components/home/AboutUs";
-import { MainImage } from "@/components/home/MainImage";
-import { OurPlan } from "@/components/home/OurPlan";
+import{ AdminMainPage } from "@/components/adminpage/AdminMainPage";
+import { AdminPlans } from "@/components/adminpage/AdminPlans";
+import { NavbarAdmin } from "@/components/common/NavbarAdmin";
+
+// import AuthenticationService from "@/components/authentication/AuthenticationService";
+// import { Navbar } from "@/components/common/Navbar";
+// import { AboutUs } from "@/components/home/AboutUs";
+// import { MainImage } from "@/components/home/MainImage";
+// import { OurPlan } from "@/components/home/OurPlan";
 import { getCookie, hasCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AboutAdmin } from "@/components/adminpage/AboutAdmin";
+
 
 export default function Home() {
   const router = useRouter();
@@ -51,11 +58,11 @@ export default function Home() {
     <main>
       {isAuthenticated ? (
         <>
-          <Navbar username={user.name} />
+          <NavbarAdmin username={user.name} />
           <div className="mt-16">
-            <MainImage />
-            <OurPlan />
-            <AboutUs />
+            <AdminMainPage />
+            <AdminPlans/>
+            <AboutAdmin />
           </div>
         </>
         
