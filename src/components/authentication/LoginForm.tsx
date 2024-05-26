@@ -17,8 +17,12 @@ export const LoginForm = () => {
             if(userData.token){
                 toast.success("Login Success!")
                 setCookie('token', userData.token)
-                setCookie('role', userData.role)
-                router.push("/")
+                if(userData.role === 'ADMIN'){
+                    router.push("/admin")
+                }
+                else{
+                    router.push("/")
+                }
             } else{
                 toast.error("Email or password is invalid!");
             }
