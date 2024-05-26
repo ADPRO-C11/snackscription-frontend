@@ -1,10 +1,11 @@
 import React from 'react';
+import { RiTeamFill } from 'react-icons/ri';
 
 export const AboutUs = () => {
   return (
     <div style={{backgroundColor: "#FFCC9F"}}>
         <div className='flex flex-col justify-center items-center p-20 px-32 gap-16'>
-            <h1 className='text-5xl font-extrabold text-center text-gray-800'>About Us</h1>
+            <h1 className='text-5xl font-extrabold text-center text-gray-800 flex justify-center items-center gap-3'>About Us <RiTeamFill /></h1>
             <div className='grid grid-cols-2 gap-32'>
                 <div>
                     <h1 className='font-bold text-2xl text-gray-800'>Snackscription</h1>

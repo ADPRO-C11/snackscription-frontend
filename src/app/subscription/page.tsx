@@ -55,7 +55,7 @@ export default function SubscriptionPage() {
   return (
     <>
       <Navbar username={user.name}/>
-      <div className='mt-16 h-screen bg-orange-100'>
+      <div className='mt-16 h-full bg-orange-100'>
         <SubscriptionContainer user={user} />
       </div>
     </>
