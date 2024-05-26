@@ -22,6 +22,7 @@ export const NavbarAdmin = ({username}: any) => {
                 <Link href={'/'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">Home</Link>
                 <Link href={'/shop'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">SubscriptionBox</Link>
                 <Link href={'/admin/logs'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">Logs</Link>
+                <Link href={'/admin/create'} className="text-white font-light py-3 rounded-md text-sm sm:text-lg hover:text-orange-200">Create New Box</Link>
             </div>
             <div className='flex items-center justify-center gap-6'>
                 <h1 className='text-white text-lg font-extralight'>Welcome, {username}</h1>

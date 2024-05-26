@@ -1,16 +1,21 @@
 "use client";
 import AuthenticationService from "@/components/authentication/AuthenticationService";
-import { Navbar } from "@/components/common/Navbar";
-import { AboutUs } from "@/components/home/AboutUs";
-import { MainImage } from "@/components/home/MainImage";
-import { OurPlan } from "@/components/home/OurPlan";
 import { getCookie, hasCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import SubscriptionBoxService from "@/components/subscription-box/SubscriptionBoxService";
+import { NavbarAdmin } from "@/components/common/NavbarAdmin";
+
+interface Log {
+  id: string;
+  logString: string;
+  subBoxId: string;
+  date: string;
+}
 
 export default function Logs() {
   const router = useRouter();
-  const [logs, setLogs] = useState<String[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [user, setUser] = useState({
     id: '',
     name: '',
@@ -33,6 +38,7 @@ export default function Logs() {
     } else {
       setIsAuthenticated(true);
       getUserProfile();
+      fetchLogs();
     }
   }, [router]);
 
@@ -46,20 +52,43 @@ export default function Logs() {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
+  const fetchLogs = async () => {
+    const token = getCookie('token');
+    try {
+      if (token) {
+        const logData: Log[] = await SubscriptionBoxService.getLogs(token);
+        setLogs(logData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <main>
       {isAuthenticated ? (
         <>
-          <Navbar username={user.name} />
-          <div className="mt-16">
-            <MainImage />
-            <OurPlan />
-            <AboutUs />
+          <NavbarAdmin username={user.name} />
+          <div className="mt-16 p-8">
+            <h1 className="text-2xl font-bold mb-4">Subscription Box Logs</h1>
+            <div className="space-y-4">
+              {logs.length > 0 ? (
+                logs.map((log) => (
+                  <div key={log.id} className="p-4 border rounded">
+                    <p><strong>ID:</strong> {log.id}</p>
+                    <p><strong>Log:</strong> {log.logString}</p>
+                    <p><strong>Subscription Box ID:</strong> {log.subBoxId}</p>
+                    <p><strong>Date:</strong> {log.date}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No logs found.</p>
+              )}
+            </div>
           </div>
         </>
-        
       ) : (
         <div className="flex items-center justify-center min-h-screen">
           <p>Loading...</p>
