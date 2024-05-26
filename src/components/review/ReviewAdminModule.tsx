@@ -60,7 +60,7 @@ export const ReviewAdminModule = () => {
         <div className="flex flex-col">
             {loading ? <p>Loading...</p> : data.map((review) => {
                 return (
-                    <div key={review.subsbox} className="h-md w-full border rounded p-3">
+                    <div key={review.author} className="h-md w-full border rounded p-3">
                         <p className="text-sm">{review.author} </p>
                         <p className="font-bold"> {review.rating}/5 </p>
                         <p className="text-md"> {review.content} </p>
