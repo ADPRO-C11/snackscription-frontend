@@ -6,14 +6,18 @@ import { NavbarAdmin } from '@/components/common/NavbarAdmin';
 import SubscriptionBoxDetail from '@/components/shop/SubscriptionBoxDetail';
 import { getCookie, hasCookie } from 'cookies-next';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 
+const PageContent = () => {
+  const searchParams = useSearchParams();
+  const name = searchParams.get('name') || '';
+
+  return <SubscriptionBoxDetail name={name} />;
+};
 
 export default function Page() {
   const role = getCookie('role') as string;
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const name = searchParams.get('name') || '';
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState({
     id: '',
@@ -65,7 +69,9 @@ export default function Page() {
         <Navbar username={user.name} /> // Render Navbar for other roles
       )}
       <div className='h-screen m-32'>
-        <SubscriptionBoxDetail name={name} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <PageContent />
+        </Suspense>
       </div>
     </div>
   );
