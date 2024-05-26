@@ -1,7 +1,8 @@
 import { getCookie } from 'cookies-next';
 import React, { useEffect, useState } from 'react';
+import { useRouter }   from 'next/navigation';
 import SubscriptionBoxService from '../subscription-box/SubscriptionBoxService';
-import { SubscriptionBoxCard } from './SubscriptionBoxCard';
+import { SubscriptionBoxNameCard } from './SubscriptionBoxNameCard';
 
 interface SubscriptionBox {
   id: string;
@@ -18,57 +19,34 @@ interface Item {
   quantity: number;
 }
 
-export const SubscriptionBoxCatalog = () => {
-  const [subscriptionBoxes, setSubscriptionBoxes] = useState<SubscriptionBox[]>([]);
+export const SubscriptionBoxCatalog: React.FC = () => {
+  const [distinctNames, setDistinctNames] = useState<string[]>([]);
   const [searchedName, setSearchedName] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [price, setPrice] = useState<number>(-1);
+  const router = useRouter();
 
-  const getSubscriptionBox = async (name?: string, price?: number, filter?: string) => {
+  const getDistinctNames = async () => {
     try {
       const token = getCookie('token');
       if (token) {
-        let subscriptionBoxesList = [];
-        if (name) {
-          subscriptionBoxesList = await SubscriptionBoxService.findByName(name,token);
-        } else if (price !== undefined && price > -1 && filter) {
-          switch (filter) {
-            case 'less-than':
-              subscriptionBoxesList = await SubscriptionBoxService.findByPriceLessThan(price, token);
-              break;
-            case 'greater-than':
-              subscriptionBoxesList = await SubscriptionBoxService.findByPriceGreaterThan(price, token);
-              break;
-            case 'equals':
-              subscriptionBoxesList = await SubscriptionBoxService.findByPriceEquals(price, token);
-              break;
-            default:
-              break;
-          }
-        } else {
-          subscriptionBoxesList = await SubscriptionBoxService.getSubscriptionBox(token);
-        }
-        setSubscriptionBoxes(subscriptionBoxesList);
+        const namesList = await SubscriptionBoxService.findDistinctNames(token);
+        setDistinctNames(namesList);
       }
     } catch (error) {
       console.log("Error", error);
+      setDistinctNames([]);
     }
   };
 
   useEffect(() => {
-    getSubscriptionBox();
+    getDistinctNames();
   }, []);
-
-  useEffect(() => {
-    if (price > -1 && priceFilter) {
-      getSubscriptionBox(undefined, price, priceFilter);
-    }
-  }, [price, priceFilter]);
 
   const handleSearch = () => {
     const name = (document.getElementById('searched_name') as HTMLInputElement).value;
     setSearchedName(name);
-    getSubscriptionBox(name);
+    getDistinctNames(); // Fetch distinct names on search
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +56,10 @@ export const SubscriptionBoxCatalog = () => {
 
   const handlePriceFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPriceFilter(event.target.value);
+  };
+
+  const handleNavigation = () => {
+    router.push('/shop/catalog');
   };
 
   return (
@@ -97,45 +79,21 @@ export const SubscriptionBoxCatalog = () => {
         </div>
       </div>
       <div className='flex justify-between items-center mb-10'>
-        <div className='flex gap-5 items-center'>
-          <label className='flex items-center'>
-            <span className='mr-2'>Price</span>
-            <input
-              type='number'
-              className='border border-black rounded-lg px-3 py-2 w-[150px]'
-              placeholder='Enter price'
-              id='price'
-              min='0'
-              onChange={handlePriceChange}
-            />
-            <select
-              className='border border-black rounded-lg px-3 py-2 ml-2'
-              id='priceFilter'
-              defaultValue='select price filter'
-              onChange={handlePriceFilterChange}
-            >
-              <option value='select price filter' disabled>
-                Select price filter
-              </option>
-              <option value='less-than'>Less than</option>
-              <option value='greater-than'>Greater than</option>
-              <option value='equals'>Equals</option>
-            </select>
-          </label>
-        </div>
+        <button className='border border-black px-3 py-2 rounded-lg' onClick={handleNavigation}>
+          Go to Subscription Boxes Catalog
+        </button>
       </div>
       <div className='grid grid-cols-3 gap-10'>
-        {subscriptionBoxes.map((box) => (
-          <SubscriptionBoxCard
-            key={box.id}
-            id={box.id}
-            name={box.name}
-            type={box.type}
-            price={box.price}
-            items={box.items}
-            description={box.description}
-          />
-        ))}
+        {distinctNames && distinctNames.length > 0 ? (
+          distinctNames.map((name, index) => (
+            <SubscriptionBoxNameCard
+              key={index}
+              name={name}     
+            />
+          ))
+        ) : (
+          <p>No subscription boxes found.</p>
+        )}
       </div>
     </>
   );
