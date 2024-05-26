@@ -2,12 +2,14 @@
 
 import AuthenticationService from '@/components/authentication/AuthenticationService';
 import { Navbar } from '@/components/common/Navbar';
+import { NavbarAdmin } from '@/components/common/NavbarAdmin';
 import { SubscriptionBoxCatalogAll } from '@/components/shop/SubscriptionBoxCatalogAll';
 import { getCookie, hasCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 export default function Page() {
+    const role = getCookie('role') as string;
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState({
@@ -55,7 +57,11 @@ export default function Page() {
     else {
         return (
             <div className='flex flex-col'>
-                <Navbar username={user.name}/>
+        {role === 'ADMIN' ? (
+            <NavbarAdmin username={user.name} /> // Render NavbarAdmin for admin role
+        ) : (
+            <Navbar username={user.name} /> // Render Navbar for other roles
+        )}
                 <div className='h-screen m-32'>
                     <SubscriptionBoxCatalogAll />
                 </div>
