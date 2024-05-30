@@ -1,12 +1,13 @@
 'use client'
 
+import { AdminSubscriptionBoxCatalogAll } from '@/components/adminpage/subscriptionbox/CatalogueAll';
 import AuthenticationService from '@/components/authentication/AuthenticationService';
 import { Navbar } from '@/components/common/Navbar';
 import { NavbarAdmin } from '@/components/common/NavbarAdmin';
-import { SubscriptionBoxCatalog } from '@/components/shop/SubscriptionBoxCatalog';
+import { SubscriptionBoxCatalogAll } from '@/components/shop/SubscriptionBoxCatalogAll';
 import { getCookie, hasCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 
 export default function Page() {
     const role = getCookie('role') as string;
@@ -63,7 +64,11 @@ export default function Page() {
             <Navbar username={user.name} /> // Render Navbar for other roles
         )}
                 <div className='h-screen m-32'>
-                    <SubscriptionBoxCatalog />
+                {role === 'ADMIN' ? (
+                    <AdminSubscriptionBoxCatalogAll />
+        ) : (
+            <SubscriptionBoxCatalogAll />
+        )}
                 </div>
             </div>
         );

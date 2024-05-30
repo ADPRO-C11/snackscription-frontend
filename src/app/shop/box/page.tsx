@@ -1,13 +1,22 @@
-'use client';
+'use client'
 
-import { Navbar } from '@/components/common/Navbar';
-import { SubscriptionContainer } from '@/components/subscription/SubscriptionContainer';
-import { hasCookie, getCookie } from 'cookies-next';
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
 import AuthenticationService from '@/components/authentication/AuthenticationService';
+import { Navbar } from '@/components/common/Navbar';
+import { NavbarAdmin } from '@/components/common/NavbarAdmin';
+import SubscriptionBoxDetail from '@/components/shop/SubscriptionBoxDetail';
+import { getCookie, hasCookie } from 'cookies-next';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
 
-export default function SubscriptionPage() {
+const PageContent = () => {
+  const searchParams = useSearchParams();
+  const name = searchParams.get('name') || '';
+
+  return <SubscriptionBoxDetail name={name} />;
+};
+
+export default function Page() {
+  const role = getCookie('role') as string;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState({
@@ -53,11 +62,17 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <>
-      <Navbar username={user.name}/>
-      <div className='mt-16 h-full bg-orange-100'>
-        <SubscriptionContainer user={user} />
+    <div className='flex flex-col'>
+      {role === 'ADMIN' ? (
+        <NavbarAdmin username={user.name} /> // Render NavbarAdmin for admin role
+      ) : (
+        <Navbar username={user.name} /> // Render Navbar for other roles
+      )}
+      <div className='h-screen m-32'>
+        <Suspense fallback={<div>Loading...</div>}>
+          <PageContent />
+        </Suspense>
       </div>
-    </>
+    </div>
   );
 }
