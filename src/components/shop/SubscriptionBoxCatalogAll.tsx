@@ -157,8 +157,11 @@ export const SubscriptionBoxCatalogAll: React.FC = () => {
                 type={box.type}
                 price={box.price}
                 items={box.items}
-                description={box.description}
-              />
+                description={box.description} onDelete={function (id: string): void {
+                  throw new Error('Function not implemented.');
+                } } onUpdate={function (): void {
+                  throw new Error('Function not implemented.');
+                } }              />
             </div>
           ))
         ) : (

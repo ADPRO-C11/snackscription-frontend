@@ -1,5 +1,5 @@
 class SubscriptionService {
-    static BASE_URL = process.env.NEXT_PUBLIC_SUBSCRIPTION_API;
+    static BASE_URL ="/api/subscription";
     
     static async createSubscription(subscription: object, token: string) {
       try {

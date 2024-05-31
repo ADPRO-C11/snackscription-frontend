@@ -1,5 +1,5 @@
 class SubscriptionBoxService {
-    static BASE_URL = process.env.NEXT_PUBLIC_SUBSCRIPTION_BOX_API as string;
+    static BASE_URL = "/api/subscription-box";
 
     static async createSubscriptionBox(subscription: object, token: string): Promise<any> {
         try {
